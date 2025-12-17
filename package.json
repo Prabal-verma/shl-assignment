@@ -12,7 +12,8 @@
     "enrich:catalog": "tsx scripts/enrich-catalog.ts",
     "build:index": "tsx scripts/build-index.ts",
     "query:shl": "tsx scripts/query-shl.ts",
-    "eval:train": "tsx scripts/evaluate.ts"
+    "eval:train": "tsx scripts/evaluate.ts",
+    "predict:test": "tsx scripts/predict-test.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
