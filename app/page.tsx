@@ -21,8 +21,8 @@ export default function Home() {
         </div>
 
         <footer className="mt-6 text-xs text-zinc-600 dark:text-zinc-400">
-          API: <span className="font-mono">GET /health</span>,{" "}
-          <span className="font-mono">POST /recommend</span>
+          API: <span className="font-mono">GET /api/health</span>,{" "}
+          <span className="font-mono">POST /api/recommend</span>
         </footer>
       </div>
     </div>
@@ -71,7 +71,7 @@ function App() {
         ? { url: trimmed, top_k: topK }
         : { query: trimmed, top_k: topK };
 
-      const res = await fetch("/recommend", {
+      const res = await fetch("/api/recommend", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
