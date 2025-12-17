@@ -4,7 +4,7 @@ import * as path from "node:path";
 import * as cheerio from "cheerio";
 import { NextRequest, NextResponse } from "next/server";
 
-import { recommend } from "../../scripts/lib/recommender";
+import { recommend } from "../../../scripts/lib/recommender";
 
 export const runtime = "nodejs";
 
@@ -49,8 +49,7 @@ function clampTopK(v: unknown): number {
 function extractTextFromHtml(html: string): string {
   const $ = cheerio.load(html);
   $("script, style, noscript").remove();
-  const text = $("body").text().replace(/\s+/g, " ").trim();
-  return text;
+  return $("body").text().replace(/\s+/g, " ").trim();
 }
 
 async function fetchUrlText(url: string): Promise<string> {
@@ -72,18 +71,6 @@ async function fetchUrlText(url: string): Promise<string> {
   }
 }
 
-function pickInput(body: RecommendRequestBody): { input: string; topK: number } {
-  const topK = clampTopK(body.top_k ?? body.topK);
-  const q = (body.query ?? "").trim();
-  const t = (body.text ?? "").trim();
-  const u = (body.url ?? "").trim();
-
-  if (q) return { input: q, topK };
-  if (t) return { input: t, topK };
-  if (u) return { input: u, topK }; // will be treated as URL below if it looks like one
-  return { input: "", topK };
-}
-
 function looksLikeUrl(s: string): boolean {
   try {
     const u = new URL(s);
@@ -93,17 +80,27 @@ function looksLikeUrl(s: string): boolean {
   }
 }
 
+function pickInput(body: RecommendRequestBody): { input: string; topK: number } {
+  const topK = clampTopK(body.top_k ?? body.topK);
+  const q = (body.query ?? "").trim();
+  const t = (body.text ?? "").trim();
+  const u = (body.url ?? "").trim();
+
+  if (q) return { input: q, topK };
+  if (t) return { input: t, topK };
+  if (u) return { input: u, topK };
+  return { input: "", topK };
+}
+
 async function handleRecommend(inputRaw: string, topK: number): Promise<RecommendResponse> {
   const idx = await loadIndex();
   const input = looksLikeUrl(inputRaw) ? await fetchUrlText(inputRaw) : inputRaw;
 
   const recs = await recommend(idx, input, topK, true);
-  const items: RecommendItem[] = recs
-    .slice(0, topK)
-    .map((r) => ({
-      assessment_name: r.name,
-      assessment_url: r.url,
-    }));
+  const items: RecommendItem[] = recs.slice(0, topK).map((r) => ({
+    assessment_name: r.name,
+    assessment_url: r.url,
+  }));
 
   return { recommended_assessments: items };
 }
@@ -111,7 +108,9 @@ async function handleRecommend(inputRaw: string, topK: number): Promise<Recommen
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("query") || req.nextUrl.searchParams.get("q") || "";
   const url = req.nextUrl.searchParams.get("url") || "";
-  const topK = clampTopK(req.nextUrl.searchParams.get("top_k") || req.nextUrl.searchParams.get("topK"));
+  const topK = clampTopK(
+    req.nextUrl.searchParams.get("top_k") || req.nextUrl.searchParams.get("topK"),
+  );
 
   const inputRaw = (q || url).trim();
   if (!inputRaw) {
@@ -146,10 +145,7 @@ export async function POST(req: NextRequest) {
 
   const { input, topK } = pickInput(body);
   if (!input) {
-    return NextResponse.json(
-      { error: "Provide one of: query, text, url" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Provide one of: query, text, url" }, { status: 400 });
   }
 
   try {
