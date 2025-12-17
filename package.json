@@ -7,13 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scrape:shl": "tsx scripts/scrape-shl.ts"
+    "scrape:shl": "tsx scripts/scrape-shl.ts",
+    "clean:catalog": "tsx scripts/clean-catalog.ts",
+    "enrich:catalog": "tsx scripts/enrich-catalog.ts",
+    "build:index": "tsx scripts/build-index.ts",
+    "query:shl": "tsx scripts/query-shl.ts",
+    "eval:train": "tsx scripts/evaluate.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "cheerio": "^1.1.2",
+    "dotenv": "^17.2.3",
     "next": "16.0.10",
     "react": "19.2.1",
-    "react-dom": "19.2.1"
+    "react-dom": "19.2.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
