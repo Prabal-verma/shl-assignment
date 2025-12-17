@@ -63,6 +63,19 @@ Endpoints are implemented using Next.js route handlers:
 - Run `npm run dev` and open `http://localhost:3000`.
 - Paste query/JD/URL, choose Top K, and view results in a table.
 
+## Deployed URLs
+Frontend (UI):
+- `https://shl-assignment-psi.vercel.app/`
+
+Backend API (same deployment):
+- Health: `https://shl-assignment-psi.vercel.app/api/health`
+- Recommend (GET example): `https://shl-assignment-psi.vercel.app/api/recommend?query=java&top_k=5`
+
+### How to know the backend API URL
+The backend is served from the same domain as the frontend. Take your deployed frontend URL and append:
+- `/api/health`
+- `/api/recommend`
+
 ## Setup
 
 ### Install
